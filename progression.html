@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Progression de la Journée</title>
+  <style>
+    body {
+      background-color: #0f172a;
+      color: #f8fafc;
+      font-family: 'Segoe UI', sans-serif;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      height: 100vh;
+      margin: 0;
+    }
+    h1 {
+      font-size: 2.5rem;
+      margin-bottom: 1rem;
+    }
+    .progress {
+      width: 90%;
+      max-width: 600px;
+      background: #1e293b;
+      border-radius: 10px;
+      overflow: hidden;
+      box-shadow: 0 0 10px rgba(0,0,0,0.2);
+    }
+    .progress-bar {
+      height: 30px;
+      background: #38bdf8;
+      width: 0%;
+      line-height: 30px;
+      text-align: center;
+      color: #0f172a;
+      font-weight: bold;
+      transition: width 0.5s ease-in-out;
+    }
+    .time-info {
+      margin-top: 1rem;
+      font-size: 1.2rem;
+      text-align: center;
+    }
+    .time-inputs {
+      margin-top: 20px;
+      display: flex;
+      justify-content: center;
+      gap: 20px;
+    }
+    input[type="time"] {
+      font-size: 1rem;
+      padding: 5px;
+      background-color: #1e293b;
+      color: #f8fafc;
+      border: none;
+      border-radius: 5px;
+    }
+  </style>
+</head>
+<body>
+  <h1>Progression de la Journée de Travail</h1>
+  <div class="progress">
+    <div class="progress-bar" id="progressBar">0%</div>
+  </div>
+  <div class="time-info" id="timeInfo"></div>
+
+  <div class="time-inputs">
+    <div>
+      <label for="startTime">Heure de début:</label>
+      <input type="time" id="startTime" value="07:14">
+    </div>
+    <div>
+      <label for="endTime">Heure de fin:</label>
+      <input type="time" id="endTime" value="16:00">
+    </div>
+  </div>
+
+  <script>
+    function updateProgress() {
+      const now = new Date();
+      const startInput = document.getElementById("startTime").value;
+      const endInput = document.getElementById("endTime").value;
+
+      const start = new Date();
+      const end = new Date();
+
+      const [startHours, startMinutes] = startInput.split(':');
+      const [endHours, endMinutes] = endInput.split(':');
+
+      start.setHours(startHours, startMinutes, 0, 0);
+      end.setHours(endHours, endMinutes, 0, 0);
+
+      let percent = 0;
+      if (now < start) {
+        percent = 0;
+      } else if (now > end) {
+        percent = 100;
+      } else {
+        const total = end - start;
+        const elapsed = now - start;
+        percent = (elapsed / total) * 100;
+      }
+
+      const bar = document.getElementById("progressBar");
+      bar.style.width = percent.toFixed(2) + "%";
+      bar.textContent = percent.toFixed(2) + "%";
+
+      const remaining = end - now;
+      const h = Math.floor(remaining / 3600000);
+      const m = Math.floor((remaining % 3600000) / 60000);
+      const s = Math.floor((remaining % 60000) / 1000);
+      document.getElementById("timeInfo").textContent =
+        `Temps restant jusqu'à ${endHours}:${endMinutes} : ${h}h ${m}m ${s}s`;
+    }
+
+    // Mettre à jour la progression à chaque modification des horaires
+    document.getElementById("startTime").addEventListener("input", updateProgress);
+    document.getElementById("endTime").addEventListener("input", updateProgress);
+
+    updateProgress();
+    setInterval(updateProgress, 1000);
+  </script>
+</body>
+</html>
+
